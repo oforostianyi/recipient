@@ -1,9 +1,12 @@
 <?php
 
 namespace Oforostianyi\Recipient;
+
 /**
  * return records by countryCode from database or MemoryStorage
- */
+ * Olexander Forostianyi aka ZViruS
+ * 2023-05-17
+  */
 class MccMncRepository
 {
     private DatabaseConnection $dbConnection;

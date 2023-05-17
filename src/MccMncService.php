@@ -1,6 +1,11 @@
 <?php
 
 namespace Oforostianyi\Recipient;
+
+/**
+ * Olexander Forostianyi aka ZViruS
+ * 2023-05-17
+ */
 class MccMncService
 {
     private MccMncRepository $mccMncRepository;

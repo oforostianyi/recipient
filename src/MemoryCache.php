@@ -1,9 +1,4 @@
 <?php
-/**
- * Class MemoryCache
- * 2022-03-39 ZV
- * Allows storing data in local cache
- */
 
 namespace Oforostianyi\Recipient;
 

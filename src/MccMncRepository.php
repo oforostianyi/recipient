@@ -42,7 +42,7 @@ class MccMncRepository
         $statement->execute();
         $result = $statement->get_result();
         while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
-            # приведем все значения к строке
+            # let's bring all the values to the string
             $row['mcc'] = (string) $row['mcc'];
             $row['mnc'] = (string) $row['mnc'];
             $row['cc'] = (string) $row['cc'];

@@ -7,9 +7,12 @@
     },
     "authors": [
         {
-            "name": "Olexander Forostianyi"
+            "name": "Olexander Forostianyi",
+            "email": "dev.aforostyaniy@gmail.com"
         }
     ],
     "minimum-stability": "dev",
-    "require": {}
+    "require": {
+        "php": ">=7.4.0"
+    }
 }

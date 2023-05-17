@@ -12,7 +12,7 @@ interface CacheInterface
      * @param int $ttl
      * @return bool
      */
-    public static function set(string $prefix, string $dataSetName, array $dataToStore = [], int $ttl = 5);
+    public static function set(string $prefix, string $dataSetName, array $dataToStore = [], int $ttl = 5): bool;
 
     /**
      * read data from cache
@@ -30,15 +30,15 @@ interface CacheInterface
      * @param string $getKey
      * @return bool
      */
-    public static function checkKey(string $prefix, string $dataSetName, string $getKey = '');
+    public static function checkKey(string $prefix, string $dataSetName, string $getKey): bool;
 
 
     /**
-     * return timeToLive for dataSet
+     * return time when dataSet is expired
      * @param string $prefix
      * @param string $dataSetName
-     * @return int|mixed
+     * @return int
      */
-    public static function ttl(string $prefix, string $dataSetName);
+    public static function expiredAt(string $prefix, string $dataSetName);
 
 }

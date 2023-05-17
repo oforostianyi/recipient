@@ -14,44 +14,35 @@ class RecipientService
     }
 
     /**
-     * @param string $recipient 380501234567
-     * @return array|bool
-     */
-    public function checkRecipient(string $recipient = '')
-    {
-        return $this->checkPhoneInfo($recipient);
-    }
-
-    /**
-     * проверяет информацию о телефоне и возвращает расширенную информацию по нему
+     * checks information about the phone and returns extended information on it
      * @param string $phoneNumber 380501234567
-     * @param string $mcc 0|255|260 etc
-     * @return bool|array true|false|[]
+     * @param string $mcc 00|255|260 etc
+     * @return bool|Recipient
      */
-    function checkPhoneInfo(string $phoneNumber = '', string $mcc = '000'): bool|Recipient
+    function check(string $phoneNumber = '', string $mcc = '000')
     {
 
         $phoneNumber = $this->fixNumber($phoneNumber, $mcc);
-        # если номер не подошел по параметрам - вернем ошибку
+        // if the number does not match the parameters - return an error
         if ($phoneNumber === false) return false;
-        # если задана страна UA а первые цифры не 380 вернем ошибку
+        // Hardcode. if the country is UA and the first digits are not 380, we will return an error
         if ($mcc == '255' && substr($phoneNumber, 0, 3) != 380) return false;
 
         $phoneNumberOK = false;
-        # определим код страны (СС). 1-4 цифры
+        $finalMCCMNC = [];
+        // define the country code (CC). 1-4 digits
         for ($c = 1; $c <= 4; $c++) {
             $countryCode = substr($phoneNumber, 0, $c);
-            # загрузим данные по коду страны.
+            // load data by country code.
             $currentPos = $this->mccMncService->getMccMncByCc($countryCode);
             if (!empty($currentPos)) {
-                # определим оператора (NDC). 1-4 цифры
+                // define an operator (NDC). 1-4 digits
                 for ($p = 1; $p <= 2; $p++) {
                     $providerCode = substr($phoneNumber, $c, $p);
                     if (!empty($currentPos[$providerCode])) {
                         $abonentNumber = substr($phoneNumber, $c + $p);
-                        # Проверим есть ли субчасть (SUBC). берем от большего к меньшему
+                        // Check if there is a subpart (SUBC). Taking from largest to smallest
                         $currentSubPos =& $currentPos[$providerCode];
-                        $finalMCCMNC = [];
                         for ($i = 6; $i >= 1; $i--) {
                             $firstDigits = substr($abonentNumber, 0, $i);
                             if (isset($currentSubPos[$firstDigits])) {
@@ -87,12 +78,11 @@ class RecipientService
     }
 
     /**
-     * проверяет номер на допустимую длину
+     * checks the number for valid length
      * @param string $localNumber номер без кода страны
      * @param string $requireLength единичная длина или несколько допустимых параметров, через запятую.
      * @return bool
      */
-
     function checkLength(string $localNumber, string $requireLength = '10'): bool
     {
         $lengths = explode(',', $requireLength);
@@ -103,48 +93,50 @@ class RecipientService
     }
 
     /**
-     * очищает номер и фиксит его, если задан параметр страны и мы знаем как фиксить
+     * clears the number and fixes it if the country parameter is given and we know how to fix it
      * @param string $phoneNumber 380501234567
-     * @param int $mcc 0
+     * @param string $mcc 0
      * @return bool|string
      */
-    public function fixNumber(string $phoneNumber, int $mcc = 0): bool|string
+    public function fixNumber(string $phoneNumber, string $mcc = '000')
     {
-        // если номер пустой или егодлина менее 9 символов или если номер массив - вернем ошибку
+        // if the number is empty or its length is less than 9 characters or if the number is an array - return an error
         if (empty($phoneNumber) || strlen($phoneNumber) < 9) return false;
-        // удалим из номера все, кроме цифр
+        // remove everything except digits from the number
         $phoneNumber = preg_replace("/([^0-9])+/", "", $phoneNumber);
-        // удалим все нули с начала номера
+        // remove all zeros from the beginning of the number
         $phoneNumber = preg_replace("/^(0)+/", "", $phoneNumber);
-
-        // допишем недостающий символы вначале номера до международного формата,
-        // если задан $mcc применим правило корректировки к номеру
+        // Hardcoded part. Bad practice.
+        // Allows you to correct the local number to the international format if the Mobile Country Code is specified.
+        // Add the missing characters at the beginning of the number to the international format,
+        // if $mcc is given, apply the adjustment rule to the number
+        // Ex. If $mcc == 255 convert 0631234567 => 380631234567
 
         switch ($mcc) {
-            case "255" :
+            case "255" : // UA
                 $padString = '380000000000';
                 $padLength = 12;
-                break; # UA
-            case "250" :
+                break;
+            case "250" : // RU
                 $padString = '70000000000';
                 $padLength = 11;
-                break; # RU
-            case "260" :
+                break;
+            case "260" : // PL
                 $padString = '40000000000';
                 $padLength = 11;
-                break; # PL
-            case "222" :
+                break;
+            case "222" : // IT
                 $padString = '390000000000';
                 $padLength = 12;
-                break; # IT
-            case "401" :
+                break;
+            case "401" : // KZ
                 $padString = '77000000000';
                 $padLength = 11;
-                break; # KZ
-            case "257" :
+                break;
+            case "257" : // BL
                 $padString = '375000000000';
                 $padLength = 12;
-                break; # BL
+                break;
             default:
                 $padString = '0';
                 $padLength = 14;

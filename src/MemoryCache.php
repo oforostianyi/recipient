@@ -12,14 +12,14 @@ class MemoryCache implements CacheInterface
     private static array $CACHE = ['DATA' => [], 'TTL' => []];
 
     /**
-     * Записывает данные в кеш
+     * Writes data to the cache
      * @param string $prefix
      * @param string $dataSetName
      * @param array $dataToStore
      * @param int $ttl
      * @return bool
      */
-    public static function set(string $prefix, string $dataSetName = 'uncnown', array $dataToStore = [], int $ttl = null)
+    public static function set(string $prefix, string $dataSetName, array $dataToStore = [], int $ttl = 60)
     {
         # бессрочно ничего не храним
         if ($ttl === 0) return false;
@@ -30,26 +30,20 @@ class MemoryCache implements CacheInterface
         # $dataToStore - входящие данные должны быть не пустым массивом
         if (empty($dataToStore) || false === is_array($dataToStore)) return false;
 
-        # пройдемся по всем ключам,и если их значения массив или объект - закодируем его в json.
         foreach ($dataToStore as $key => $value) {
             # вставим значение в локальный хеш, потом запишем в Redis
             self::$CACHE['DATA'][$prefix][$dataSetName][$key] = $value;
         }
-        # проверяем, задан ли ttl и в каком он формате
-        if (is_numeric($ttl)) {
-            # если ttl задан в виде числа проверим, а существует ли такое значение
-            if (isset(self::$CACHE['TTL'][$prefix][$dataSetName])) {
-                # и если значение существует и больше либо равно текущему времени, то не обновляем
-                if (self::$CACHE['TTL'][$prefix][$dataSetName] >= time()) {
-                    return true;
-                }
+
+        if (isset(self::$CACHE['TTL'][$prefix][$dataSetName])) {
+            # if the value exists and is greater than or equal to the current time, then do not update
+            if (self::$CACHE['TTL'][$prefix][$dataSetName] >= time()) {
+                return true;
             }
-            # устанавливаем новое значение ttl
-            self::$CACHE['TTL'][$prefix][$dataSetName] = time() + $ttl;
-        } else {
-            # если ttl задан в виде строки, приведем ее ко времени
-            self::$CACHE['TTL'][$prefix][$dataSetName] = strtotime($ttl);
         }
+        # устанавливаем новое значение ttl
+        self::$CACHE['TTL'][$prefix][$dataSetName] = time() + $ttl;
+
         return true;
     }
 

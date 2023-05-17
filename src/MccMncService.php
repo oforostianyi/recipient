@@ -10,7 +10,7 @@ class MccMncService
         $this->mccMncRepository = $mccMncRepository;
     }
 
-    public function getMccMncByCc(int $cc): ?array
+    public function getMccMncByCc(int $cc)
     {
         return $this->mccMncRepository->getMccMncByCc($cc);
     }

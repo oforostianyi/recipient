@@ -3,6 +3,13 @@
 namespace Oforostianyi\Recipient;
 class DatabaseConnection
 {
+    /**
+     * @param string $host
+     * @param string $username
+     * @param string $password
+     * @param string $database
+     * @throws \Exception
+     */
     public function __construct(string $host, string $username, string $password, string $database)
     {
         $this->connection = new \mysqli($host, $username, $password, $database);
@@ -11,6 +18,9 @@ class DatabaseConnection
         }
     }
 
+    /**
+     * @return \mysqli
+     */
     public function getConnection(): \mysqli
     {
         return $this->connection;

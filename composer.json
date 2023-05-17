@@ -1,0 +1,15 @@
+{
+    "name": "oforostianyi/recipient",
+    "autoload": {
+        "psr-4": {
+            "Oforostianyi\\Recipient\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Olexander Forostianyi"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {}
+}
